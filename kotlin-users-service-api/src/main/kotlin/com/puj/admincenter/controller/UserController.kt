@@ -4,6 +4,7 @@ import com.puj.admincenter.domain.users.User
 import com.puj.admincenter.dto.users.CreateUserDto
 import com.puj.admincenter.dto.users.UserDto
 import com.puj.admincenter.service.UserService
+import com.puj.admincenter.dto.users.updatePasswordDto
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,4 +42,11 @@ class UserController(private val userService: UserService) {
     fun create(@RequestBody @Valid createUserDto: CreateUserDto, 
                @RequestHeader(value="authorization", required=true) authorization: String): ResponseEntity<*>
         = userService.create(createUserDto)
+
+    @PutMapping(
+        consumes = ["application/json"],
+        produces = ["application/json"]
+    )
+    fun updatePassword(@RequestBody @Valid UpPass: updatePasswordDto): ResponseEntity<*>
+        = userService.updatePsw(UpPass)
 }
