@@ -76,7 +76,7 @@ class UserService(private val userRepository: UserRepository) {
             userRepository.updatePasswordByUsername(nPas, user.id)
             LOG.info("Password of User ${updateP.username} updated with id ${user.id}")
             val responseDto = IdResponseDto(user.id.toLong())
-            ResponseEntity<String>(responseDto, HttpStatus.OK)
+            ResponseEntity<IdResponseDto>(responseDto, HttpStatus.OK)
         }
         else{
             val message2 = "the user does not exist or is not enabled" 
