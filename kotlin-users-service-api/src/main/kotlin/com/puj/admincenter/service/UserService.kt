@@ -9,6 +9,7 @@ import com.puj.admincenter.dto.login.LoginDto
 import com.puj.admincenter.dto.login.TokenDto
 import com.puj.admincenter.dto.users.updatePasswordDto
 
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Page
 import org.springframework.security.crypto.bcrypt.BCrypt
@@ -65,18 +66,17 @@ class UserService(private val userRepository: UserRepository) {
                                              HttpStatus.CREATED)
     }
 
+    @Transactional
     fun updatePsw(updateP: updatePasswordDto): ResponseEntity<*> {
         val encriptador = BCryptPasswordEncoder()
         val contra = userRepository.passwordByUsername(updateP.username)
         val user = userRepository.findUserByUsername(updateP.username)
         return if (user != null && encriptador.matches(updateP.password, contra)){
             val nPas = encriptador.encode(updateP.passwordN)
-            user.password = nPas
-            userRepository.deleteById(user.id)
-            val userUp = userRepository.save(user)
-            LOG.info("Password of User ${updateP.username} updated with id ${userUp.id}")
-            val message = "updated"
-            ResponseEntity<String>(message, HttpStatus.OK)
+            userRepository.updatePasswordByUsername(nPas, user.id)
+            LOG.info("Password of User ${updateP.username} updated with id ${user.id}")
+            val responseDto = IdResponseDto(user.id.toLong())
+            ResponseEntity<String>(responseDto, HttpStatus.OK)
         }
         else{
             val message2 = "the user does not exist or is not enabled" 

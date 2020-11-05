@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.repository.query.Param
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -44,4 +45,8 @@ interface UserRepository : JpaRepository<User, Int>,
         WHERE User.username = :username
     """)
     fun findUserByUsername(username: String): User?
+    
+    @Modifying
+    @Query("UPDATE User User SET User.password = :nPassword WHERE User.id = :id")
+    fun updatePasswordByUsername(nPassword: String, id: Int)
 }
