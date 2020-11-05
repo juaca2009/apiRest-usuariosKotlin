@@ -1,0 +1,6 @@
+- servidor
+	ssh historiasclinicas@ssh-historiasclinicas.alwaysdata.net
+-- base de datos
+	mysql -h mysql-historiasclinicas.alwaysdata.net -u  203256 -p historiasclinicas_usuarios
+-- contraseña para todo (servidor/base de datos)
+    juancamilo99
