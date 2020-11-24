@@ -45,6 +45,20 @@ interface UserRepository : JpaRepository<User, Int>,
         WHERE User.username = :username
     """)
     fun findUserByUsername(username: String): User?
+
+    @Query("""
+        SELECT User.password
+        FROM User User
+        WHERE User.email = :email
+    """)
+    fun findPasswordByEmail(email: String): String?
+
+    @Query("""
+        SELECT User
+        FROM User User
+        WHERE User.email = :email
+    """)
+    fun findUserByEmail(email: String): User?
     
     @Modifying
     @Query("UPDATE User User SET User.password = :nPassword WHERE User.id = :id")

@@ -37,11 +37,11 @@ class LoginService(val userRepository: UserRepository) {
     fun login(loginDto: LoginDto): ResponseEntity<*> {
 
         val encriptador = BCryptPasswordEncoder() //instancia
-        val contra = userRepository.passwordByUsername(loginDto.username) //obtengo contra encriptada
-        val user = userRepository.findUserByUsername(loginDto.username) //ontengo contraseña de la base de datos
+        val contra = userRepository.findPasswordByEmail(loginDto.email) //obtengo contra encriptada
+        val user = userRepository.findUserByEmail(loginDto.email) //ontengo contraseña de la base de datos
         return if (user != null && encriptador.matches(loginDto.password, contra)) {  //comparo si el usuario existe y si las contraseñas existen
             logger.info("found user $user")
-            val jwtToken = getJWTToken(loginDto.username)
+            val jwtToken = getJWTToken(loginDto.email)
     
             println("tokenJwt: $jwtToken")
 
