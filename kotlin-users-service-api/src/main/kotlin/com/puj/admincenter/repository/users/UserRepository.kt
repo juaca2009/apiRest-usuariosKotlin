@@ -26,6 +26,13 @@ interface UserRepository : JpaRepository<User, Int>,
                                   password: String): User?
 
     @Query("""
+        SELECT User
+        FROM User User
+        WHERE User.id = :id
+    """)
+    fun findUserById(id: Int): User?
+
+    @Query("""
         SELECT COUNT(User) > 0
         FROM User User
         WHERE User.email = :email
@@ -38,6 +45,14 @@ interface UserRepository : JpaRepository<User, Int>,
         WHERE User.username = :username
     """)
     fun passwordByUsername(username: String): String
+
+    @Modifying
+    @Query("""
+        DELETE
+        FROM User user
+        WHERE user.id = :id
+    """)
+    fun deleteByUserId(@Param("id") id: Int): Int
 
     @Query( """
         SELECT User
@@ -63,4 +78,8 @@ interface UserRepository : JpaRepository<User, Int>,
     @Modifying
     @Query("UPDATE User User SET User.password = :nPassword WHERE User.id = :id")
     fun updatePasswordByUsername(nPassword: String, id: Int)
+
+    @Modifying
+    @Query("UPDATE User User SET User.password = :nPassword, User.email= :nEmail, User.name= :nName, User.username= :nUsername WHERE User.id = :id")
+    fun updateUser(nPassword: String, nEmail:String, nName:String, nUsername:String, id: Int)
 }

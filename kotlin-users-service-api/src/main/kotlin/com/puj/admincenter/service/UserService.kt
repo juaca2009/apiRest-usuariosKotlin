@@ -5,15 +5,13 @@ import com.puj.admincenter.dto.users.UserDto
 import com.puj.admincenter.dto.users.CreateUserDto
 import com.puj.admincenter.dto.IdResponseDto
 import com.puj.admincenter.repository.users.UserRepository
-import com.puj.admincenter.dto.login.LoginDto
-import com.puj.admincenter.dto.login.TokenDto
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import com.puj.admincenter.dto.users.updatePasswordDto
-
+import com.puj.admincenter.dto.users.UpdateUserDto
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Page
 import org.springframework.security.crypto.bcrypt.BCrypt
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder //IMPORTO LIBRERIA PARA ENCRIPTAR
 import org.springframework.stereotype.Service
 import org.springframework.http.ResponseEntity
 import org.springframework.http.HttpStatus
@@ -40,6 +38,15 @@ class UserService(private val userRepository: UserRepository) {
             ResponseEntity.ok(UserDto.convert(user.get()))
         } else {
             ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+        }
+    }
+
+    fun getAllUsers():ResponseEntity<List<User>>{
+        val user = userRepository!!.findAll()
+        return if (user!=null) {
+            ResponseEntity.ok(user)
+        } else {
+            ResponseEntity<List<User>>(HttpStatus.NOT_FOUND)
         }
     }
 
@@ -83,4 +90,41 @@ class UserService(private val userRepository: UserRepository) {
             ResponseEntity<String>(message2, HttpStatus.NOT_FOUND)
         }
     }
+
+    @Transactional
+    fun editUser(userId: Int, updateUserDto: UpdateUserDto): ResponseEntity<*> {
+        val currentUser = userRepository.findById(userId);
+        return if(currentUser != null) {
+            val encriptador=BCryptPasswordEncoder()
+
+            val contra_encrip = encriptador.encode(updateUserDto.password)
+            val updateUser:User = currentUser.get().copy(
+                email = updateUserDto.email,
+                name = updateUserDto.name,
+                password=contra_encrip,
+                username = updateUserDto.username
+            )
+            val userSaved = userRepository.save(updateUser)
+            LOG.info("User ${userSaved.email} was updated successfully")
+    
+            ResponseEntity<Any>(HttpStatus.OK)
+        } else {
+            LOG.error("User not found")
+            ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+        }
+    }
+
+    @Transactional
+    fun deleteUser(userId: Int): ResponseEntity<*> {
+        val currentUser = userRepository.findUserById(userId);
+        return if(currentUser != null)  {
+            userRepository.deleteByUserId(userId)
+            LOG.info("User with id $userId was deleted successfully")
+
+            ResponseEntity<Any>(HttpStatus.OK)
+        } else {
+            LOG.error("User not found")
+            ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+        }
+    } 
 }

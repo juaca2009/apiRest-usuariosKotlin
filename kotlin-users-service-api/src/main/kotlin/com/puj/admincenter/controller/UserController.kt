@@ -5,6 +5,7 @@ import com.puj.admincenter.dto.users.CreateUserDto
 import com.puj.admincenter.dto.users.UserDto
 import com.puj.admincenter.service.UserService
 import com.puj.admincenter.dto.users.updatePasswordDto
+import com.puj.admincenter.dto.users.UpdateUserDto
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -34,13 +35,17 @@ class UserController(private val userService: UserService) {
                 @RequestHeader(value="authorization", required=false) authorization: String?): ResponseEntity<*>
         = userService.getById(userId,
                               authorization)
+                        
+    @GetMapping("")
+    fun getUsers(): ResponseEntity<List<User>>
+        = userService.getAllUsers()
 
     @PostMapping(
         consumes = ["application/json"],
         produces = ["application/json"]
     )
     fun create(@RequestBody @Valid createUserDto: CreateUserDto, 
-               @RequestHeader(value="authorization", required=true) authorization: String): ResponseEntity<*>
+               @RequestHeader(value="authorization", required=false) authorization: String?): ResponseEntity<*>
         = userService.create(createUserDto)
 
     @PutMapping(
@@ -49,4 +54,16 @@ class UserController(private val userService: UserService) {
     )
     fun updatePassword(@RequestBody @Valid UpPass: updatePasswordDto): ResponseEntity<*>
         = userService.updatePsw(UpPass)
+
+    @PutMapping(
+        value = ["/{userId}"],
+        consumes = ["application/json"],
+        produces = ["application/json"]
+    )
+    fun edit(@PathVariable userId: Int, @RequestBody @Valid updateUserDto: UpdateUserDto, @RequestHeader(value="authorization", required=false) authorization: String?): ResponseEntity<*>
+        = userService.editUser(userId, updateUserDto)
+
+    @DeleteMapping("/{userId}")
+    fun delete(@PathVariable userId: Int, @RequestHeader(value="authorization", required=false) authorization: String?): ResponseEntity<*>
+        = userService.deleteUser(userId)  
 }
